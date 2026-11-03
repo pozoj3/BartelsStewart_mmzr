@@ -1,15 +1,19 @@
 # BartelsStewart_mmzr
 Projekt za kolegij Matematičko modeliranje i znanstveno računanje - Bartels-Stewartov algoritam za rješavanje Syvesterove jednadžbe
 
-# Kostur projekta:
+## Kostur projekta:
+```text
 BartelsStewart/
 ├── Project.toml
+├── README.md
 ├── src/
-│   ├── BartelsStewart.jl   # glavni modul: include-a ostale datoteke, exporta funkcije
-│   ├── hessenberg.jl       # Householderovo svođenje na Hessenbergovu formu (HSHLDR + BCKMLT)
-│   ├── schur.jl            # QR algoritam → realna Schurova forma (SCHUR)
-│   ├── smallsolve.jl       # mali sustavi 1×1, 2×2, 4×4 (SYSSLV)
-│   ├── sylvester.jl        # AX + XB = C: transformacija + blok supstitucija (AXPXB + SHRSLV)
-│   └── lyapunov.jl         # AᵀX + XA = C, simetrični slučaj (ATXPXA + SYMSLV)
+│   ├── BartelsStewart.jl   # glavni modul
+│   ├── hessenberg.jl       # Householder → gornja Hessenbergova forma
+│   ├── schur.jl            # QR algoritam → realna Schurova forma
+│   ├── smallsolve.jl       # mali sustavi reda 1, 2, 3 i 4
+│   ├── sylvester.jl        # AX + XB = C
+│   └── lyapunov.jl         # AᵀX + XA = C
 └── test/
-    └── runtests.jl         # usporedba s LinearAlgebra.sylvester, provjera reziduala
+    └── runtests.jl         # testovi
+```
+
