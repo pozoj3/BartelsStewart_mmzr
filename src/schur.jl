@@ -8,7 +8,7 @@
 
 # POMOCNA FUNKCIJA ZA FRANCIS STEP, PRIMA MATRICE H i Q, indexe hi,lo i vrijednosti s i t (ZBROJ I UMNOŽAK KORIJENA)
 function francis_step!(H,Q,hi,lo,s,t)
-
+    N = size(H, 1)
     # (H - mi1*I)(H - m2*I) = H^2 - s*H + t*I
     h11, h12 = H[lo, lo], H[lo, lo+1]
     h21, h22 = H[lo+1, lo], H[lo+1, lo+1]
@@ -43,6 +43,32 @@ end
 # Vraća gornju kvazi-trokutastu matricu `T` (dijagonalni blokovi reda 1 ili 2)
 # i ortogonalnu matricu `U` takve da je `T = Uᵀ A U`.
 
+function split_real_2x2!(H, Q, i)
+    a, b, c, d = H[i, i], H[i, i+1], H[i+1, i], H[i+1, i+1]
+    c == 0 && return H
+
+    p = (a - d) / 2
+    disc = p^2 + b * c
+    disc < 0 && return H
+
+    λ = (a + d) / 2 + copysign(sqrt(disc), p)
+    v1, v2 = b, λ - a
+    if abs(λ - d) + abs(c) > abs(v1) + abs(v2)
+        v1, v2 = λ - d, c
+    end
+    r = hypot(v1, v2)
+    r == 0 && return H
+    cs, sn = v1 / r, v2 / r
+    G = [cs -sn; sn cs]
+
+    rows = i:i+1
+    H[rows, i:end] = G' * H[rows, i:end]
+    H[1:i+1, rows] = H[1:i+1, rows] * G
+    Q[:, rows] = Q[:, rows] * G
+    H[i+1, i] = 0
+    return H
+end
+
 function real_schur(A::AbstractMatrix; tol = eps(), maxiter = 100)
     H, Q = hessenberg_householder(A)
     n = size(H, 1)
@@ -62,6 +88,7 @@ function real_schur(A::AbstractMatrix; tol = eps(), maxiter = 100)
         if lo == hi                  # izdvojen blok 1×1 (realna sv. vrijednost)
             hi -= 1; iter = 0
         elseif lo == hi - 1          # izdvojen blok 2×2
+            split_real_2x2!(H, Q, lo)    # ako su sv. vrijednosti realne → dva bloka 1×1
             hi -= 2; iter = 0
         else                         # prozor reda ≥ 3: jedan QR korak
             iter += 1
